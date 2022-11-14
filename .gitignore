@@ -1,0 +1,4 @@
+#ignore dossier ".idea" pycharm
+\.idea
+#ignore environnement virtuel "venv"
+\venv
