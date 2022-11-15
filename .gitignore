@@ -1,4 +1,8 @@
-#ignore dossier ".idea" pycharm
+# ignore dossier ".idea" pycharm
 \.idea
-#ignore environnement virtuel "venv"
+# ignore environnement virtuel "venv"
 \venv
+# ignore fichiers csv
+*csv
+# ignore images
+*jpg
