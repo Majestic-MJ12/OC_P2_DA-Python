@@ -6,3 +6,5 @@
 *csv
 # ignore images
 *jpg
+# ignore extracted data
+\data_extracted
