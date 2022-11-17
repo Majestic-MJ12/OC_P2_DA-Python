@@ -26,7 +26,7 @@ print("\n")
 # /folder for the csv file creation
 
 # website to scrap
-url2 = "http://books.toscrape.com/catalogue/category/books/poetry_23/index.html"
+url2 = "http://books.toscrape.com/catalogue/category/books/mystery_3/index.html"
 # /website to scrap
 requests.get(url2)
 response2 = requests.get(url2)
@@ -40,6 +40,23 @@ else:
 soup2 = BeautifulSoup(response2.content, "html.parser")
 # /use of beautifulsoup
 
+next_page = soup2.find("li", {"class": "next"})
+next_page = next_page["class"]
+li = soup2.find("li", {"class": "next"})
+
+print(next_page)
+while next_page:
+    url2 = urljoin("http://books.toscrape.com/catalogue/category/books/mystery_3/", li.find("a").get("href"))
+    requests.get(url2)
+    response2 = requests.get(url2)
+    # use of beautifulsoup
+    soup2 = BeautifulSoup(response2.content, "html.parser")
+    # /use of beautifulsoup
+
+    next_page = soup2.find("li", {"class": "next"})
+    next_page = next_page["class"]
+    li = soup2.find("li", {"class": "next"})
+    print(url2)
 li_books = []
 
 
@@ -47,7 +64,7 @@ li_books = []
 def get_url_books():
     global li_books
     for link in soup2.find_all('h3'):
-        li_books.append(urljoin("http://books.toscrape.com/catalogue/category/books/poetry_23/index.html",
+        li_books.append(urljoin("http://books.toscrape.com/catalogue/category/books/mystery_3/index.html",
                                 link.find("a").get("href")))
     return li_books
 # /Get the list of the book from one category
@@ -55,11 +72,11 @@ def get_url_books():
 
 get_url_books()
 
-description = []
+
+books_category = []
 
 
 # website to scrap
-
 for books in li_books:
     url = books
     # /website to scrap
@@ -77,6 +94,7 @@ for books in li_books:
     # /Variables with soup to extract information needed
 
     # get all needed information to create the csv file
+    description = []
 
     product_page_url = url
     description.append(product_page_url)
@@ -123,7 +141,7 @@ for books in li_books:
     value_url = "http://books.toscrape.com/" + image_url
     description.append(value_url)
     # /get all needed information to create the csv file
-    print(description)
+    books_category.append(description)
 
 # create the csv file with the headers and the descriptions
 with open("data_extracted/data.csv", "w", encoding='UTF8', newline='') as data_csv:
@@ -133,7 +151,7 @@ with open("data_extracted/data.csv", "w", encoding='UTF8', newline='') as data_c
                      "number_available",
                      "product_description", "category", "review_rating", "image_url"])
     # data add in csv file
-    writer.writerow(description)
+    writer.writerows(books_category)
 
     if True:
         print("All the data has been scrapped in the folder: data_extracted")
