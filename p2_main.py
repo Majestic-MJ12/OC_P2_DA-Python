@@ -26,7 +26,7 @@ print("\n")
 # /folder for the csv file creation
 
 # website to scrap
-url2 = "http://books.toscrape.com/catalogue/category/books/mystery_3/index.html"
+url2 = "https://books.toscrape.com/catalogue/category/books/young-adult_21/index.html"
 # /website to scrap
 requests.get(url2)
 response2 = requests.get(url2)
@@ -46,7 +46,8 @@ li = soup2.find("li", {"class": "next"})
 
 print(next_page)
 while next_page:
-    url2 = urljoin("http://books.toscrape.com/catalogue/category/books/mystery_3/", li.find("a").get("href"))
+    url2 = urljoin("https://books.toscrape.com/catalogue/category/books/young-adult_21/index.html".rstrip(),
+                   li.find("a").get("href"))
     requests.get(url2)
     response2 = requests.get(url2)
     # use of beautifulsoup
@@ -54,9 +55,10 @@ while next_page:
     # /use of beautifulsoup
 
     next_page = soup2.find("li", {"class": "next"})
-    next_page = next_page["class"]
+    if next_page is not None:
+        next_page = next_page["class"]
     li = soup2.find("li", {"class": "next"})
-    print(url2)
+
 li_books = []
 
 
@@ -64,7 +66,7 @@ li_books = []
 def get_url_books():
     global li_books
     for link in soup2.find_all('h3'):
-        li_books.append(urljoin("http://books.toscrape.com/catalogue/category/books/mystery_3/index.html",
+        li_books.append(urljoin("https://books.toscrape.com/catalogue/category/books/young-adult_21/index.html",
                                 link.find("a").get("href")))
     return li_books
 # /Get the list of the book from one category
