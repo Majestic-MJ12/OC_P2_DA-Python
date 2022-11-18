@@ -26,7 +26,7 @@ print("\n")
 # /folder for the csv file creation
 
 # website to scrap
-url2 = "https://books.toscrape.com/catalogue/category/books/young-adult_21/index.html"
+url2 = "https://books.toscrape.com/catalogue/category/books/travel_2/index.html"
 # /website to scrap
 requests.get(url2)
 response2 = requests.get(url2)
@@ -40,110 +40,103 @@ else:
 soup2 = BeautifulSoup(response2.content, "html.parser")
 # /use of beautifulsoup
 
-next_page = soup2.find("li", {"class": "next"})
-next_page = next_page["class"]
-li = soup2.find("li", {"class": "next"})
+books_category = []
 
-print(next_page)
-while next_page:
-    url2 = urljoin("https://books.toscrape.com/catalogue/category/books/young-adult_21/index.html".rstrip(),
-                   li.find("a").get("href"))
-    requests.get(url2)
-    response2 = requests.get(url2)
-    # use of beautifulsoup
-    soup2 = BeautifulSoup(response2.content, "html.parser")
-    # /use of beautifulsoup
+while True:
+    li_books = []
+
+    # Get the list of the book from one category
+    def get_url_books():
+        global li_books
+        for link in soup2.find_all('h3'):
+            li_books.append(urljoin("https://books.toscrape.com/catalogue/category/books/travel_2/index.html",
+                                    link.find("a").get("href")))
+        return li_books
+    # /Get the list of the book from one category
+
+    get_url_books()
+
+    # website to scrap
+    for books in li_books:
+        url = books
+        # /website to scrap
+        # online url?
+        requests.get(url)
+        response = requests.get(url)
+        # use of beautifulsoup
+        soup = BeautifulSoup(response.content, "html.parser")
+        # /use of beautifulsoup
+
+        # Variables with soup to extract information needed
+        tr = soup.findAll("tr")
+        p = soup.findAll("p")
+        a = soup.findAll("a")
+        # /Variables with soup to extract information needed
+
+        # get all needed information to create the csv file
+        description = []
+
+        product_page_url = url
+        description.append(product_page_url)
+
+        title = soup.find("h1").string
+        description.append(title)
+
+        upc = tr[0].td.string
+        description.append(upc)
+
+        price_including_tax = tr[2].td.string
+        price_including_tax = re.sub('[^0-9.]+', '', price_including_tax)
+        description.append(price_including_tax)
+
+        price_excluding_tax = tr[3].td.string
+        price_excluding_tax = re.sub('[^0-9.]+', '', price_excluding_tax)
+        description.append(price_excluding_tax)
+
+        number_available = tr[5].td.string
+        description.append(number_available)
+
+        product_description = p[3].string
+        description.append(product_description)
+
+        category = a[3].string
+        description.append(category)
+
+        review_rating = soup.find("p", {"class": "star-rating"})
+        review_rating = review_rating["class"]
+        if "One" in review_rating:
+            review_rating = "1"
+        elif "Two" in review_rating:
+            review_rating = "2"
+        elif "Three" in review_rating:
+            review_rating = "3"
+        elif "Four" in review_rating:
+            review_rating = "4"
+        elif "Five" in review_rating:
+            review_rating = "5"
+        description.append(review_rating)
+
+        image_url = soup.find_all("img")
+        image_url = image_url[0].get("src")
+        value_url = "http://books.toscrape.com/" + image_url
+        description.append(value_url)
+        # /get all needed information to create the csv file
+        books_category.append(description)
 
     next_page = soup2.find("li", {"class": "next"})
     if next_page is not None:
         next_page = next_page["class"]
-    li = soup2.find("li", {"class": "next"})
+        li = soup2.find("li", {"class": "next"})
+        url2 = urljoin("https://books.toscrape.com/catalogue/category/books/travel_2/index.html".rstrip(),
+                       li.find("a").get("href"))
+        requests.get(url2)
+        response2 = requests.get(url2)
+        # use of beautifulsoup
+        soup2 = BeautifulSoup(response2.content, "html.parser")
+        # /use of beautifulsoup
+    else:
+        break
 
-li_books = []
-
-
-# Get the list of the book from one category
-def get_url_books():
-    global li_books
-    for link in soup2.find_all('h3'):
-        li_books.append(urljoin("https://books.toscrape.com/catalogue/category/books/young-adult_21/index.html",
-                                link.find("a").get("href")))
-    return li_books
-# /Get the list of the book from one category
-
-
-get_url_books()
-
-
-books_category = []
-
-
-# website to scrap
-for books in li_books:
-    url = books
-    # /website to scrap
-    # online url?
-    requests.get(url)
-    response = requests.get(url)
-    # use of beautifulsoup
-    soup = BeautifulSoup(response.content, "html.parser")
-    # /use of beautifulsoup
-
-    # Variables with soup to extract information needed
-    tr = soup.findAll("tr")
-    p = soup.findAll("p")
-    a = soup.findAll("a")
-    # /Variables with soup to extract information needed
-
-    # get all needed information to create the csv file
-    description = []
-
-    product_page_url = url
-    description.append(product_page_url)
-
-    title = soup.find("h1").string
-    description.append(title)
-
-    upc = tr[0].td.string
-    description.append(upc)
-
-    price_including_tax = tr[2].td.string
-    price_including_tax = re.sub('[^0-9.]+', '', price_including_tax)
-    description.append(price_including_tax)
-
-    price_excluding_tax = tr[3].td.string
-    price_excluding_tax = re.sub('[^0-9.]+', '', price_excluding_tax)
-    description.append(price_excluding_tax)
-
-    number_available = tr[5].td.string
-    description.append(number_available)
-
-    product_description = p[3].string
-    description.append(product_description)
-
-    category = a[3].string
-    description.append(category)
-
-    review_rating = soup.find("p", {"class": "star-rating"})
-    review_rating = review_rating["class"]
-    if "One" in review_rating:
-        review_rating = "1"
-    elif "Two" in review_rating:
-        review_rating = "2"
-    elif "Three" in review_rating:
-        review_rating = "3"
-    elif "Four" in review_rating:
-        review_rating = "4"
-    elif "Five" in review_rating:
-        review_rating = "5"
-    description.append(review_rating)
-
-    image_url = soup.find_all("img")
-    image_url = image_url[0].get("src")
-    value_url = "http://books.toscrape.com/" + image_url
-    description.append(value_url)
-    # /get all needed information to create the csv file
-    books_category.append(description)
 
 # create the csv file with the headers and the descriptions
 with open("data_extracted/data.csv", "w", encoding='UTF8', newline='') as data_csv:
