@@ -1,4 +1,4 @@
-# import from pip
+# import package
 import csv
 import re
 import os.path
@@ -6,8 +6,7 @@ import requests
 from art import *
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
-
-# /import from pip
+# /import package
 
 # welcome message
 tprint("OpenClassrooms", "white_bubble")
@@ -25,23 +24,59 @@ if not os.path.exists(directory):
 print("\n")
 # /folder for the csv file creation
 
-# website to scrap
-url2 = "https://books.toscrape.com/catalogue/category/books/travel_2/index.html"
-# /website to scrap
-requests.get(url2)
-response2 = requests.get(url2)
-if response2.status_code != 200:
+# get soup from main url
+url3 = "https://books.toscrape.com/index.html"
+requests.get(url3)
+response3 = requests.get(url3)
+# online?
+if response3.status_code != 200:
     print("bad URL")
 else:
-    print("The website to scrap is online:", response2)
+    print("The website to scrap is online:", response3)
     print("\n")
     # /online?
 # use of beautifulsoup
+soup3 = BeautifulSoup(response3.content, "html.parser")
+# /use of beautifulsoup
+# get soup from main url
+
+# list of all categories url
+li_category = []
+# / list of all categories url
+
+
+# function to get all the categories url from the main page
+def get_url_category():
+    global li_category
+    for cat in soup3.findAll("a"):
+        li_category.append(urljoin("https://books.toscrape.com/index.html".rstrip(), cat.get("href")))
+    return li_category
+
+
+get_url_category()
+# function to get all the categories url from the main page
+
+# remove the two first useless url from the categories url list
+del li_category[0:3]
+del li_category[50:120]
+print(li_category)
+# / remove the two first useless url from the categories url list
+
+
+# get soup from one category url
+url2 = "https://books.toscrape.com/catalogue/category/books/travel_2/index.html"
+requests.get(url2)
+response2 = requests.get(url2)
+# use of beautifulsoup
 soup2 = BeautifulSoup(response2.content, "html.parser")
 # /use of beautifulsoup
+# / get soup from one category url
 
+# list of all url on one category's page
 books_category = []
+# list of all url on one category's page
 
+# buckle to fill the books_category
 while True:
     li_books = []
 
@@ -120,8 +155,9 @@ while True:
         image_url = image_url[0].get("src")
         value_url = "http://books.toscrape.com/" + image_url
         description.append(value_url)
-        # /get all needed information to create the csv file
+
         books_category.append(description)
+        # /get all needed information to create the csv file
 
     next_page = soup2.find("li", {"class": "next"})
     if next_page is not None:
@@ -136,7 +172,7 @@ while True:
         # /use of beautifulsoup
     else:
         break
-
+# buckle to fill the books_category
 
 # create the csv file with the headers and the descriptions
 with open("data_extracted/data.csv", "w", encoding='UTF8', newline='') as data_csv:
