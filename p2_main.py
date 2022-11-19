@@ -55,7 +55,6 @@ soup3 = BeautifulSoup(response3.content, "html.parser")
 
 # list of all categories url
 li_category = []
-print(li_category)
 # / list of all categories url
 
 
