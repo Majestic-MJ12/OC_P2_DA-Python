@@ -23,7 +23,6 @@ if os.path.exists(directory):
 if not os.path.exists(directory):
     os.makedirs(directory)
     print("Folder as been created for scrapping the website data:", "Folder name:", directory)
-print("\n")
 # /folder for the csv files creation
 
 # folder for the pics files creation
@@ -45,6 +44,7 @@ if response3.status_code != 200:
     print("bad URL")
 else:
     print("The website to scrap is online:", response3)
+    print("\n")
     print("Be patient for all the files creation now :)")
     print("\n")
     # /online?
@@ -211,4 +211,7 @@ for category in li_category:
             print("A new file has been created :", csv_name)
             print("You can open this file with a csv software now")
             print("All pictures of :" + category + " has been downloaded")
+        if category == "Crime":
+            print("\n")
+            print("ALL CATEGORIES HAVE BEEN SCRAPED")
     # /create the csv file with the headers and the descriptions
