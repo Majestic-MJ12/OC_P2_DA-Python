@@ -171,7 +171,7 @@ for category in li_category:
 
             # creation of all the pictures
             r = requests.get(value_url, stream=True)
-            with open(directory + category + "_" + re.sub(":", "", title) + "_" + time.strftime("%Y-%m-%d") + ".jpg",
+            with open(directory + category + "_" + re.sub("[^a-zA-Z0-9]+", "", title) + "_" + time.strftime("%Y-%m-%d") + ".jpg",
                       "wb") as pic_dl:
                 shutil.copyfileobj(r.raw, pic_dl)
                 # /creation of all the pictures
