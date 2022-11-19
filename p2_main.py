@@ -1,4 +1,4 @@
-# import package
+# import package from pip
 import csv
 import re
 import os.path
@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import time
 import shutil
-# /import package
+# /import package from pip
 
 # welcome message
 tprint("OpenClassrooms", "black_bubble")
@@ -16,7 +16,7 @@ tprint("P2_DA Python", "black_bubble")
 print("\n")
 # /welcome message
 
-# folder for the csv file creation
+# folder for the csv files creation
 directory = "data_extracted/csv"
 if os.path.exists(directory):
     print("Folder needed for scrapping data already exist:", "Folder name :", directory)
@@ -24,9 +24,9 @@ if not os.path.exists(directory):
     os.makedirs(directory)
     print("Folder as been created for scrapping the website data:", "Folder name:", directory)
 print("\n")
-# /folder for the csv file creation
+# /folder for the csv files creation
 
-# folder for the csv file creation
+# folder for the pics files creation
 directory = "data_extracted/pics/"
 if os.path.exists(directory):
     print("Folder needed for scrapping img already exist:", "Folder name :", directory)
@@ -34,7 +34,7 @@ if not os.path.exists(directory):
     os.makedirs(directory)
     print("Folder as been created for scrapping the website img:", "Folder name:", directory)
 print("\n")
-# /folder for the csv file creation
+# /folder for the pics files creation
 
 # get soup from main url
 url3 = "https://books.toscrape.com/index.html"
@@ -51,11 +51,11 @@ else:
 # use of beautifulsoup
 soup3 = BeautifulSoup(response3.content, "html.parser")
 # /use of beautifulsoup
-# get soup from main url
+# /get soup from main url
 
 # list of all categories url
 li_category = []
-num_cat = 1
+print(li_category)
 # / list of all categories url
 
 
@@ -70,20 +70,21 @@ def get_url_category():
 get_url_category()
 # function to get all the categories url from the main page
 
-# remove the two first useless url from the categories url list
+# remove the useless url from the categories url list
 del li_category[0:3]
 del li_category[50:100]
-# / remove the two first useless url from the categories url list
+# / remove the useless url from the categories url list
 
+# get soup from category url
 for category in li_category:
     url2 = category
-    # /website to scrap
     # online url?
     requests.get(url2)
     response2 = requests.get(url2)
     # use of beautifulsoup
     soup2 = BeautifulSoup(response2.content, "html.parser")
     # /use of beautifulsoup
+# /get soup from category url
 
     # list of all url on one category's page
     books_category = []
@@ -93,18 +94,18 @@ for category in li_category:
     while True:
         li_books = []
 
-        # Get the list of the book from one category
+        # function to get the url of the books from one category
         def get_url_books():
             global li_books
             for link in soup2.find_all('h3'):
                 li_books.append(urljoin(url2,
                                         link.find("a").get("href")))
             return li_books
-        # /Get the list of the book from one category
 
         get_url_books()
+        # /function to get the url of the books from one category
 
-        # website to scrap
+        # get soup from one book url
         for books in li_books:
             url = books
             # /website to scrap
@@ -114,6 +115,7 @@ for category in li_category:
             # use of beautifulsoup
             soup = BeautifulSoup(response.content, "html.parser")
             # /use of beautifulsoup
+            # /get soup from one book url
 
             # Variables with soup to extract information needed
             tr = soup.findAll("tr")
@@ -168,14 +170,17 @@ for category in li_category:
             image_url = image_url[0].get("src")
             value_url = "http://books.toscrape.com/" + image_url
 
+            # creation of all the pictures
             r = requests.get(value_url, stream=True)
             with open(directory + category + "_" + re.sub(":", "", title) + "_" + time.strftime("%Y-%m-%d") + ".jpg",
                       "wb") as pic_dl:
                 shutil.copyfileobj(r.raw, pic_dl)
+                # /creation of all the pictures
 
             books_category.append(description)
             # /get all needed information to create the csv file
 
+        # is there another page?
         next_page = soup2.find("li", {"class": "next"})
         if next_page is not None:
             next_page = next_page["class"]
@@ -189,10 +194,11 @@ for category in li_category:
             # /use of beautifulsoup
         else:
             break
+            # /is there another page?
     # buckle to fill the books_category
 
     # create the csv file with the headers and the descriptions
-    csv_name = "data_extracted/csv/" + time.strftime("%Y-%m-%d") + "_category_" + str(num_cat) + ".csv"
+    csv_name = "data_extracted/csv/" + time.strftime("%Y-%m-%d") + "_" + category + ".csv"
     with open(csv_name, "w", encoding='UTF8', newline='') as data_csv:
         writer = csv.writer(data_csv, delimiter=";")
         # gives the header name row into csv
@@ -205,5 +211,5 @@ for category in li_category:
         if True:
             print("A new file has been created :", csv_name)
             print("You can open this file with a csv software now")
+            print("All pictures of :" + category + " has been downloaded")
     # /create the csv file with the headers and the descriptions
-    num_cat = num_cat + 1
