@@ -7,21 +7,32 @@ from art import *
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import time
+import shutil
 # /import package
 
 # welcome message
-tprint("OpenClassrooms", "white_bubble")
-tprint("P2_DA Python", "white_bubble")
+tprint("OpenClassrooms", "black_bubble")
+tprint("P2_DA Python", "black_bubble")
 print("\n")
 # /welcome message
 
 # folder for the csv file creation
-directory = "data_extracted"
+directory = "data_extracted/csv"
 if os.path.exists(directory):
-    print("Folder needed for scrapping already exist:", "Folder name :", directory)
+    print("Folder needed for scrapping data already exist:", "Folder name :", directory)
 if not os.path.exists(directory):
-    os.mkdir(directory)
+    os.makedirs(directory)
     print("Folder as been created for scrapping the website data:", "Folder name:", directory)
+print("\n")
+# /folder for the csv file creation
+
+# folder for the csv file creation
+directory = "data_extracted/pics/"
+if os.path.exists(directory):
+    print("Folder needed for scrapping img already exist:", "Folder name :", directory)
+if not os.path.exists(directory):
+    os.makedirs(directory)
+    print("Folder as been created for scrapping the website img:", "Folder name:", directory)
 print("\n")
 # /folder for the csv file creation
 
@@ -34,6 +45,7 @@ if response3.status_code != 200:
     print("bad URL")
 else:
     print("The website to scrap is online:", response3)
+    print("Be patient for all the files creation now :)")
     print("\n")
     # /online?
 # use of beautifulsoup
@@ -155,7 +167,11 @@ for category in li_category:
             image_url = soup.find_all("img")
             image_url = image_url[0].get("src")
             value_url = "http://books.toscrape.com/" + image_url
-            description.append(value_url)
+
+            r = requests.get(value_url, stream=True)
+            with open(directory + category + "_" + re.sub(":", "", title) + "_" + time.strftime("%Y-%m-%d") + ".jpg",
+                      "wb") as pic_dl:
+                shutil.copyfileobj(r.raw, pic_dl)
 
             books_category.append(description)
             # /get all needed information to create the csv file
@@ -176,7 +192,7 @@ for category in li_category:
     # buckle to fill the books_category
 
     # create the csv file with the headers and the descriptions
-    csv_name = "data_extracted/" + time.strftime("%Y-%m-%d") + "_category_" + str(num_cat) + ".csv"
+    csv_name = "data_extracted/csv/" + time.strftime("%Y-%m-%d") + "_category_" + str(num_cat) + ".csv"
     with open(csv_name, "w", encoding='UTF8', newline='') as data_csv:
         writer = csv.writer(data_csv, delimiter=";")
         # gives the header name row into csv
@@ -187,7 +203,7 @@ for category in li_category:
         writer.writerows(books_category)
 
         if True:
-            print("The file name is :", csv_name)
-            print("You can open the file with a csv software now")
+            print("A new file has been created :", csv_name)
+            print("You can open this file with a csv software now")
     # /create the csv file with the headers and the descriptions
     num_cat = num_cat + 1
