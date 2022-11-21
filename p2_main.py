@@ -16,6 +16,7 @@ tprint("P2_DA Python", "black_bubble")
 print("\n")
 # /welcome message
 
+# creation of the folders for the extraction if they don't exist yet
 # folder for the csv files creation
 directory = "data_extracted/csv"
 if os.path.exists(directory):
@@ -23,8 +24,7 @@ if os.path.exists(directory):
 if not os.path.exists(directory):
     os.makedirs(directory)
     print("Folder as been created for scrapping the website data:", "Folder name:", directory)
-# /folder for the csv files creation
-
+    # /folder for the csv files creation
 # folder for the pics files creation
 directory = "data_extracted/pics/"
 if os.path.exists(directory):
@@ -34,11 +34,14 @@ if not os.path.exists(directory):
     print("Folder as been created for scrapping the website img:", "Folder name:", directory)
 print("\n")
 # /folder for the pics files creation
+# /creation of the folders for the extraction if they don't exist yet
 
-# get soup from main url
+# get soup from main url (data extraction)
+# main url
 url3 = "https://books.toscrape.com/index.html"
 requests.get(url3)
 response3 = requests.get(url3)
+# /main url
 # online?
 if response3.status_code != 200:
     print("bad URL")
@@ -48,17 +51,17 @@ else:
     print("Be patient for all the files creation now :)")
     print("\n")
     # /online?
-# use of beautifulsoup
+# use of beautifulsoup on main url
 soup3 = BeautifulSoup(response3.content, "html.parser")
-# /use of beautifulsoup
-# /get soup from main url
+# /use of beautifulsoup on main url
+# /get soup from main url (data extraction)
 
 # list of all categories url
 li_category = []
 # / list of all categories url
 
 
-# function to get all the categories url from the main page
+# function to get all the categories url from the main page (data extraction)
 def get_url_category():
     global li_category
     for cat in soup3.findAll("a"):
@@ -67,33 +70,38 @@ def get_url_category():
 
 
 get_url_category()
-# function to get all the categories url from the main page
+# /function to get all the categories url from the main page (data extraction)
 
 # remove the useless url from the categories url list
 del li_category[0:3]
 del li_category[50:100]
 # / remove the useless url from the categories url list
 
-# get soup from category url
+# get soup from category url (data extraction)
 for category in li_category:
+    # category url
     url2 = category
+    # /category url
     # online url?
     requests.get(url2)
     response2 = requests.get(url2)
-    # use of beautifulsoup
+    # /online url?
+    # use of beautifulsoup on category url
     soup2 = BeautifulSoup(response2.content, "html.parser")
-    # /use of beautifulsoup
-# /get soup from category url
+    # /use of beautifulsoup on category url
+# /get soup from category url (data extraction)
 
     # list of all url on one category's page
     books_category = []
     # list of all url on one category's page
 
-    # buckle to fill the books_category
+    # buckle to fill the books_category list (data extraction + transformation)
     while True:
+        # list of all books from one category
         li_books = []
+        # /list of all books from one category
 
-        # function to get the url of the books from one category
+        # function to get the url of the books from one category (data extraction)
         def get_url_books():
             global li_books
             for link in soup2.find_all('h3'):
@@ -102,27 +110,29 @@ for category in li_category:
             return li_books
 
         get_url_books()
-        # /function to get the url of the books from one category
+        # /function to get the url of the books from one category (data extraction)
 
-        # get soup from one book url
+        # get soup from one book url (data extraction)
         for books in li_books:
+            # url from one book
             url = books
-            # /website to scrap
+            # /url from one book
             # online url?
             requests.get(url)
             response = requests.get(url)
-            # use of beautifulsoup
+            # online url?
+            # use of beautifulsoup (data extraction)
             soup = BeautifulSoup(response.content, "html.parser")
-            # /use of beautifulsoup
-            # /get soup from one book url
+            # /use of beautifulsoup (data extraction)
+            # /get soup from one book url (data extraction)
 
-            # Variables with soup to extract information needed
+            # Variables with soup to extract information needed (data extraction)
             tr = soup.findAll("tr")
             p = soup.findAll("p")
             a = soup.findAll("a")
-            # /Variables with soup to extract information needed
+            # /Variables with soup to extract information needed (data extraction)
 
-            # get all needed information to create the csv file
+            # get all needed information to create the csv file (data transformation)
             description = []
 
             product_page_url = url
@@ -169,15 +179,16 @@ for category in li_category:
             image_url = image_url[0].get("src")
             value_url = "http://books.toscrape.com/" + image_url
 
-            # creation of all the pictures
+            # creation of all the pictures (data load)
             r = requests.get(value_url, stream=True)
-            with open(directory + category + "_" + re.sub("[^a-zA-Z0-9]+", "", title) + "_" + time.strftime("%Y-%m-%d") + ".jpg",
+            with open(directory + category + "_" + re.sub("[^a-zA-Z0-9]+", "", title) + "_" +
+                      time.strftime("%Y-%m-%d_%H.%M.%S") + ".jpg",
                       "wb") as pic_dl:
                 shutil.copyfileobj(r.raw, pic_dl)
-                # /creation of all the pictures
+                # /creation of all the pictures (data load)
 
             books_category.append(description)
-            # /get all needed information to create the csv file
+            # /get all needed information to create the csv file (data transformation)
 
         # is there another page?
         next_page = soup2.find("li", {"class": "next"})
@@ -188,25 +199,28 @@ for category in li_category:
                            li.find("a").get("href"))
             requests.get(url2)
             response2 = requests.get(url2)
-            # use of beautifulsoup
+            # use of beautifulsoup for the next page of the category
             soup2 = BeautifulSoup(response2.content, "html.parser")
-            # /use of beautifulsoup
+            # /use of beautifulsoup for the next page of the category
         else:
             break
             # /is there another page?
-    # buckle to fill the books_category
+    # /buckle to fill the books_category (data extraction + transformation)
 
-    # create the csv file with the headers and the descriptions
-    csv_name = "data_extracted/csv/" + time.strftime("%Y-%m-%d") + "_" + category + ".csv"
+    # create the csv file with the headers and the descriptions (data load)
+    csv_name = "data_extracted/csv/" + time.strftime("%Y-%m-%d_%H.%M.%S") + "_" + category + ".csv"
     with open(csv_name, "w", encoding='UTF8', newline='') as data_csv:
         writer = csv.writer(data_csv, delimiter=";")
         # gives the header name row into csv
         writer.writerow(['product_page_url', 'title', 'upc', 'price_including_tax', "price_excluding_tax",
                          "number_available",
                          "product_description", "category", "review_rating", "image_url"])
-        # data add in csv file
+        # /gives the header name row into csv
+        # add data in csv file
         writer.writerows(books_category)
+        # /add data in csv file
 
+        # progress display in terminal
         if True:
             print("A new file has been created :", csv_name)
             print("You can open this file with a csv software now")
@@ -214,4 +228,5 @@ for category in li_category:
         if category == "Crime":
             print("\n")
             print("ALL CATEGORIES HAVE BEEN SCRAPED")
-    # /create the csv file with the headers and the descriptions
+            # /progress display in terminal
+    # /create the csv file with the headers and the descriptions (data load)
