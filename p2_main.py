@@ -178,6 +178,7 @@ for category in li_category:
             image_url = soup.find_all("img")
             image_url = image_url[0].get("src")
             value_url = "http://books.toscrape.com/" + image_url
+            description.append(value_url)
 
             # creation of all the pictures (data load)
             r = requests.get(value_url, stream=True)
