@@ -9,8 +9,9 @@ Download the repository on your computer (zip) or clone it thanks to this url : 
 
 Make sure you're in a virtual environment
 
-# Make sure that you're using the right requirements by running the following command
+# Requirements
 
+Make sure that you're using the right requirements by running the following command:
 pip install -r requirements.txt
 
 # Run the script
