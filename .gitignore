@@ -1,7 +1,7 @@
 # ignore ".idea" pycharm folder
-\.idea
+/.idea
 # ignore environnement virtuel "venv"
-\venv
+/venv
 # ignore __pycache__
 __pycache__
 # ignore csv files
@@ -9,4 +9,4 @@ __pycache__
 # ignore images
 *jpg
 # ignore extracted data
-\data_extracted
+/data_extracted
