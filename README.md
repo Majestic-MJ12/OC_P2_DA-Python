@@ -28,3 +28,7 @@ You will find the scraped data in the folder named: "data_extrated"
 |____data_extrated
 | |____csv
 | |____pics
+
+# LICENCE
+
+GNU AFFERO GENERAL PUBLIC LICENSE
