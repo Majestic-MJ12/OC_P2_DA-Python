@@ -29,6 +29,6 @@ You will find the scraped data in the folder named: "data_extrated"
 | |____csv
 | |____pics
 
-# LICENCE
+# LICENSE
 
 GNU AFFERO GENERAL PUBLIC LICENSE
